@@ -1,0 +1,11 @@
+numpy>=1.26
+pandas>=2.0
+matplotlib>=3.8
+scipy>=1.11
+pytest>=8
+spacy>=3.7
+# word vectors for the text tier (from spaCy's GitHub releases):
+# pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl
+# optional, for the all-MiniLM-L6-v2 check (model files go in models/all-MiniLM-L6-v2):
+# onnxruntime>=1.17
+# tokenizers>=0.15

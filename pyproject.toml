@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whoknows"
+version = "5.0.0"
+description = "Finding undeclared knowledge in agent networks without overloading a few people: a simulator."
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26", "pandas>=2.0", "matplotlib>=3.8", "scipy>=1.11", "spacy>=3.7"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+minilm = ["sentence-transformers>=3.0"]
+
+[tool.setuptools.packages.find]
+include = ["whoknows*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

@@ -1,0 +1,24 @@
+  speed / agents: 180 runs saved, 1064s
+  speed / agents+approvals: 180 runs saved, 895s
+wrote 790 runs to results/runs.csv and results/summary.csv
+  priority_agents / priority=none: 50 runs saved, 438s
+  priority_agents / priority=asker: 50 runs saved, 453s
+  priority_agents / priority=answerer: 50 runs saved, 498s
+  priority_agents / priority=audit: 50 runs saved, 452s
+  priority_agents / priority=budget: 50 runs saved, 450s
+  agent_load / rate=15/h: 70 runs saved, 201s
+  agent_load / rate=60/h: 70 runs saved, 735s
+  agent_load / rate=120/h: 70 runs saved, 1579s
+  triage_cost / triage=0.0s: 30 runs saved, 307s
+  triage_cost / triage=2.0s: 30 runs saved, 357s
+  triage_cost / triage=8.0s: 30 runs saved, 409s
+  inflation / priority=asker,inflaters=0.0: 30 runs saved, 289s
+  inflation / priority=asker,inflaters=0.3: 30 runs saved, 285s
+  inflation / priority=asker,inflaters=0.6: 30 runs saved, 281s
+  inflation / priority=audit,inflaters=0.0: 30 runs saved, 310s
+  inflation / priority=audit,inflaters=0.3: 30 runs saved, 299s
+  inflation / priority=audit,inflaters=0.6: 30 runs saved, 315s
+  inflation / priority=budget,inflaters=0.0: 30 runs saved, 320s
+  inflation / priority=budget,inflaters=0.3: 30 runs saved, 302s
+  inflation / priority=budget,inflaters=0.6: 30 runs saved, 298s
+wrote 1610 runs to results/runs.csv and results/summary.csv

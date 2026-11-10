@@ -1,0 +1,61 @@
+  gate / people: 90 runs saved, 141s
+  gate / agents: 90 runs saved, 297s
+wrote 1790 runs to results/runs.csv and results/summary.csv
+multiprocessing.pool.RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/multiprocessing/pool.py", line 125, in worker
+    result = (True, func(*args, **kwds))
+                    ~~~~^^^^^^^^^^^^^^^
+  File "/home/claude/whoknows-v5/whoknows/experiments.py", line 162, in _build
+    build_world(replace(ccfg, seed=seed))
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/whoknows-v5/whoknows/company.py", line 677, in build_world
+    w = History(cfg).run().world()
+        ~~~~~~~~~~~~~~~~^^
+  File "/home/claude/whoknows-v5/whoknows/company.py", line 575, in run
+    self.step()
+    ~~~~~~~~~^^
+  File "/home/claude/whoknows-v5/whoknows/company.py", line 404, in step
+    p.team = cand[int(rng.choice(len(cand), p=w))].id
+                      ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "numpy/random/_generator.pyx", line 869, in numpy.random._generator.Generator.choice
+ValueError: a must be a positive integer unless no samples are taken
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/claude/whoknows-v5/whoknows/experiments.py", line 282, in <module>
+    main()
+    ~~~~^^
+  File "/home/claude/whoknows-v5/whoknows/experiments.py", line 276, in main
+    df = run(names, a.seeds, a.out, a.procs, strategies, skip_done=a.skip_done)
+  File "/home/claude/whoknows-v5/whoknows/experiments.py", line 199, in run
+    list(pool.imap_unordered(_build, [(ccfg, seed) for seed in range(seeds)]))
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/multiprocessing/pool.py", line 873, in next
+    raise value
+ValueError: a must be a positive integer unless no samples are taken
+=== rerun after the gate calibration Tue Nov 10 00:51:53 AEDT 2026 ===
+  gate / people: 90 runs saved, 128s
+  gate / agents: 90 runs saved, 280s
+wrote 1790 runs to results/runs.csv and results/summary.csv
+  net_size / agents=130: 45 runs saved, 134s
+=== network runs with stewards from the whole network Tue Nov 10 01:03:23 AEDT 2026 ===
+  net_size / agents=130: 45 runs saved, 115s
+  net_size / agents=300: 45 runs saved, 340s
+  net_speed / agents: 45 runs saved, 2633s
+  net_speed / agents+approvals: 25 runs saved, 995s
+wrote 1950 runs to results/runs.csv and results/summary.csv
+  net_priority / priority=none: 12 runs saved, 881s
+  net_priority / priority=asker: 12 runs saved, 996s
+  net_priority / priority=answerer: 12 runs saved, 4508s
+  net_priority / priority=audit: 12 runs saved, 1009s
+  net_priority / priority=budget: 12 runs saved, 924s
+  net_inflation / priority=asker,inflaters=0.6: 12 runs saved, 960s
+  net_inflation / priority=audit,inflaters=0.6: 12 runs saved, 1040s
+wrote 2034 runs to results/runs.csv and results/summary.csv
+ALL DONE

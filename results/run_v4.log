@@ -1,0 +1,30 @@
+  speed / people: 180 runs saved, 390s
+  speed / agents: 180 runs saved, 701s
+  speed / agents+approvals: 180 runs saved, 839s
+wrote 540 runs to results/runs.csv and results/summary.csv
+  priority_people / priority=none: 50 runs saved, 89s
+  priority_people / priority=asker: 50 runs saved, 90s
+  priority_people / priority=answerer: 50 runs saved, 93s
+  priority_people / priority=audit: 50 runs saved, 100s
+  priority_people / priority=budget: 50 runs saved, 97s
+  priority_agents / priority=none: 50 runs saved, 371s
+  priority_agents / priority=asker: 50 runs saved, 359s
+  priority_agents / priority=answerer: 50 runs saved, 412s
+  priority_agents / priority=audit: 50 runs saved, 381s
+  priority_agents / priority=budget: 50 runs saved, 348s
+  agent_load / rate=15/h: 70 runs saved, 155s
+  agent_load / rate=60/h: 70 runs saved, 618s
+  agent_load / rate=120/h: 70 runs saved, 1352s
+  triage_cost / triage=0.0s: 30 runs saved, 253s
+  triage_cost / triage=2.0s: 30 runs saved, 277s
+  triage_cost / triage=8.0s: 30 runs saved, 310s
+  inflation / priority=asker,inflaters=0.0: 30 runs saved, 248s
+  inflation / priority=asker,inflaters=0.3: 30 runs saved, 239s
+  inflation / priority=asker,inflaters=0.6: 30 runs saved, 251s
+  inflation / priority=audit,inflaters=0.0: 30 runs saved, 252s
+  inflation / priority=audit,inflaters=0.3: 30 runs saved, 251s
+  inflation / priority=audit,inflaters=0.6: 30 runs saved, 266s
+  inflation / priority=budget,inflaters=0.0: 30 runs saved, 249s
+  inflation / priority=budget,inflaters=0.3: 30 runs saved, 255s
+  inflation / priority=budget,inflaters=0.6: 30 runs saved, 254s
+wrote 1610 runs to results/runs.csv and results/summary.csv

@@ -1,0 +1,8 @@
+__pycache__/
+.pytest_cache/
+.venv/
+town_runs/
+*.pyc
+.cache/
+models/
+previous_versions/
