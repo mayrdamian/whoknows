@@ -183,3 +183,83 @@ class TopicVectors:
         size, spread = self.QUESTION_OFFSET[qtype]
         m = size * np.exp(spread * draw.normal() - spread ** 2 / 2) / np.sqrt(2)
         return _unit(v + m * self.Q[qtype] + m * noise)
+
+
+class LazyTopicVectors(TopicVectors):
+    """The same kind of vectors, built on demand (v6, Phase 3).
+
+    A network of 100,000 agents has about 24,000 topics in 2,800 lanes: one
+    weight and one work vector per topic and lane would not fit in memory. Here
+    the lane part is the lane's own component (fully shared across topics, as
+    fitted in §14.2), each topic-lane weight is drawn from its own seed when it
+    is first needed, and work and item vectors are computed when asked for. The
+    weights and spreads are those of TopicVectors, so the similarities are the
+    same; the individual draws differ.
+    """
+
+    def __init__(self, space: Space, dim: int = 64, seed: int = 7,
+                 lane_spread: float = 0.45, aspect_spread: float = 0.45):
+        self.space = space
+        self.dim = dim
+        self.seed = seed
+        self.lane_spread = lane_spread
+        rng = np.random.default_rng((seed, 31))
+
+        def parts(n: int) -> np.ndarray:
+            return _unit(rng.normal(size=(n, dim)))
+
+        s = space
+        self.D = parts(s.domains)
+        self.T = parts(s.n_topics)
+        self.L = parts(s.n_systems)                # one component per lane, shared by all its topics
+        self.K = parts(s.n_topics * s.aspects).reshape(s.n_topics, s.aspects, dim)
+        self.Q = dict(zip(QTYPES, parts(len(QTYPES))))
+        self.R = parts(1)[0]
+        self.LEADERSHIP = parts(1)[0]
+        self.SW = parts(1)[0]
+        self.w_aspect = self.W_ASPECT * np.exp(aspect_spread * rng.normal(size=(s.n_topics, s.aspects))
+                                               - aspect_spread ** 2 / 2)
+        self.w_shared_wording = self.W_SHARED_WORDING * np.exp(aspect_spread * rng.normal(size=s.n_topics)
+                                                               - aspect_spread ** 2 / 2)
+        topic_domain = np.repeat(np.arange(s.domains), s.topics_per_domain)
+        self._base = self.W_DOMAIN * self.D[topic_domain] + self.W_TOPIC * self.T
+
+    def lane_weight(self, topic: int, system: int) -> float:
+        z = np.random.default_rng((self.seed, 37, topic, system)).normal()
+        return float(self.W_LANE * np.exp(self.lane_spread * z - self.lane_spread ** 2 / 2))
+
+    @lru_cache(maxsize=200_000)
+    def work_by_system(self, topic: int, system: int) -> np.ndarray:
+        return _unit(self._base[topic] + self.lane_weight(topic, system) * self.L[system])
+
+    def work_vec(self, topic: int, lane: int) -> np.ndarray:
+        return self.work_by_system(topic, self.space.system_index(lane))
+
+    def item_vec(self, item: int) -> np.ndarray:
+        t, lane, k = self.space.item_parts(item)
+        sys = self.space.system_index(lane)
+        v = self._base[t] + self.lane_weight(t, sys) * self.L[sys] + self.w_aspect[t, k] * self.K[t, k]
+        if lane == CORE:
+            v = _unit(v) + self.w_shared_wording[t] * self.SW
+        return _unit(v)
+
+    def item_matrix(self) -> np.ndarray:
+        raise NotImplementedError("too many items to list; use item_vec")
+
+    def role_vec(self, role: tuple) -> np.ndarray:
+        if role[0] == "leadership":
+            return _unit(self.LEADERSHIP + self.R)
+        if role[0] == "lead":
+            return _unit(self.L[role[1]] + self.R)
+        return _unit(self.D[role[1]] + self.R)
+
+
+class WorkTable:
+    """Looks like the (topic, system) array of work vectors, computed on demand."""
+
+    def __init__(self, vectors: LazyTopicVectors):
+        self.vectors = vectors
+
+    def __getitem__(self, key: tuple[int, int]) -> np.ndarray:
+        topic, system = key
+        return self.vectors.work_by_system(int(topic), int(system))

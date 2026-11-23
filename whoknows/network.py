@@ -68,3 +68,31 @@ def company_in_network_terms(seed: int = 0, **changes) -> CompanyConfig:
     """The v3 company, with the open network's topic vectors instead of v3's
     sentences: the first check of the gate (DESIGN.md §14.5)."""
     return replace(CompanyConfig(seed=seed, tier="network"), **changes)
+
+
+# --------------------------------------------------------------------------
+# v6 (Phase 3): networks of 10,000 agents and more (DESIGN.md §15)
+# --------------------------------------------------------------------------
+
+LANES_PER_1000 = 28
+DOMAINS_PER_1000 = 40
+
+
+def large_network_config(n_agents: int = 10_000, seed: int = 0, **changes) -> CompanyConfig:
+    """The open network with the settings that let it grow to 10,000 agents and beyond.
+
+    * The topic space grows with the network: 28 lanes and 40 domains per
+      1,000 agents, so about three groups share a lane at every size (with a
+      fixed 28 lanes, larger networks had more holders per lane: the confound
+      noted in Phase 2). At 1,000 agents the space is Phase 2's.
+    * Contacts are drawn per agent instead of per pair (same chances).
+    * Each agent remembers at most 200 others (the agent observed longest ago
+      is forgotten).
+    * Topic vectors are built on demand.
+    """
+    scale = n_agents / 1000
+    base = network_config(n_agents, seed=seed)
+    cfg = replace(base, lanes=max(LANES_PER_1000, round(LANES_PER_1000 * scale)),
+                  domains=max(DOMAINS_PER_1000, round(DOMAINS_PER_1000 * scale)),
+                  contacts="sampled", memory_limit=200, vector_mode="lazy")
+    return replace(cfg, **changes)

@@ -23,7 +23,7 @@ from scipy.stats import t as t_dist
 
 from .company import CompanyConfig, build_world, with_adversaries
 from .metrics import summarize
-from .network import company_in_network_terms, network_config
+from .network import company_in_network_terms, large_network_config, network_config
 from .sim import Sim, SimConfig
 from .strategies import MAIN, SWEEP, make
 
@@ -64,6 +64,12 @@ NET_BUSY_SIM = replace(BUSY_AGENT_SIM, company_decisions=0.0)
 NET = network_config(1000)
 GATE_CO = company_in_network_terms()
 NET_PRIORITY_STRATEGIES = ["ask_senior", "learned_local", "attested_search"]
+
+# v6 (Phase 3): the options for large networks (DESIGN.md §15)
+P3_SIM = replace(NET_SIM, search_index="hnsw", own_work_events="lazy")
+# a quarter of an hour of questions, with the deadline peaks spread over the hour, and
+# question topics drawn among those held in the lane asked about (DESIGN.md §15.4)
+P3_SHORT_SIM = replace(P3_SIM, horizon=900.0, peak_window=3600.0, question_topics="held")
 
 
 def _sim(**kw) -> SimConfig:
@@ -116,6 +122,9 @@ def scenarios() -> dict[str, list[tuple]]:
                  ("agents", GATE_CO, AGENT_SIM, False)],
         # experiment 1 in the open network: the same rules at 130, 300 and 1,000 agents
         "net_size": [(f"agents={n}", network_config(n), NET_SIM, False) for n in (130, 300)],
+        # v6: the gate (1,000 agents, every large-network option on) and size at equal run settings
+        "p3_gate": [("agents, v6 options", large_network_config(1000), P3_SIM, False)],
+        "p3_size": [(f"agents={n}", large_network_config(n), P3_SHORT_SIM, False) for n in (1000, 10000)],
         "net_speed": [("agents", NET, NET_SIM, False),
                       ("agents+approvals", NET, NET_MIXED_SIM, False)],
         # experiment 2 in the open network: who sets the priority, at 60 questions per agent and hour
@@ -150,6 +159,7 @@ SWEEPS = ["growth", "reminders", "decisions", "load", "own_work", "turnover", "a
           "tiers", "sensitivity"]
 V4 = ["speed", "agent_load", "priority_people", "priority_agents", "inflation", "triage_cost"]
 V5 = ["gate", "net_size", "net_speed", "net_priority", "net_inflation"]
+V6 = ["p3_gate", "p3_size"]
 
 
 def _world(ccfg: CompanyConfig, seed: int, adversaries: bool):
@@ -209,7 +219,7 @@ def run(names: list[str], seeds: int, out: str, procs: int = 2, strategies=None,
 
 
 def _strategies_for(name: str, variant: str) -> list[str]:
-    if name in ("baseline", "minilm", "speed", "gate", "net_size"):
+    if name in ("baseline", "minilm", "speed", "gate", "net_size", "p3_gate", "p3_size"):
         return MAIN
     if name == "net_speed":
         return MAIN if variant == "agents" else PRIORITY_STRATEGIES
@@ -268,6 +278,8 @@ def main(argv=None):
         names = V4
     elif a.scenario == "v5":
         names = V5
+    elif a.scenario == "v6":
+        names = V6
     elif a.scenario == "sweeps":
         names = SWEEPS
     else:

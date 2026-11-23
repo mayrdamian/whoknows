@@ -172,6 +172,8 @@ def _v5_metrics(sim: Sim, qs, n: int) -> dict:
     out = {
         "top1_share_inbox": _top_share(inbox, k1),
         "top1_share_reads": _top_share([s.reads for s in st], k1),
+        # v6: the busiest 0.1 % (10 agents in a network of 10,000)
+        "top01_share_inbox": _top_share(inbox, max(1, int(round(0.001 * len(st))))),
         "newcomer_share": float(new.mean()),
         "correct_newcomers": _rate([q for q in qs if new[q.asker]], ok),
         "correct_others": _rate([q for q in qs if not new[q.asker]], ok),

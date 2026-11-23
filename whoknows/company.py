@@ -24,8 +24,8 @@ import numpy as np
 
 from . import text as T
 from .embed import CACHE_DIR, get_embedder
-from .memory import Memory
-from .topics import CORE, Space, TopicVectors
+from .memory import Memory, without
+from .topics import CORE, LazyTopicVectors, Space, TopicVectors, WorkTable
 
 # The v3 company's topic space: 8 domains of 6 topics, 16 client systems + the
 # core platform, 6 aspects. Its sentences come from text.py.
@@ -78,6 +78,10 @@ class CompanyConfig:
                                           # quarter, instead of a probability per pair (cross_mixing)
     stewards: str = "first_team"     # who owns a core domain: the member of the first team who holds
                                      # most of it (v3), or "anyone" in the whole network
+    # v6 (Phase 3), for very large networks; the defaults reproduce v5 exactly
+    contacts: str = "pairs"          # pairs: one draw per pair of people; sampled: per person (same chances)
+    memory_limit: int | None = None  # remember at most this many agents (least recently seen is forgotten)
+    vector_mode: str = "dense"       # tier "network": dense (v5) or lazy (v6, built on demand)
     vector_dim: int = 64             # tier "network": dimension of the topic vectors ...
     vector_spread: float = 0.45      # ... and how much lanes, aspects and wordings vary (topics.py)
 
@@ -141,13 +145,14 @@ class World:
 
     @property
     def dim(self) -> int:
-        return self.vec_item.shape[1]
+        return self.vec_item.shape[1] if self.vec_item is not None else self.cfg.vector_dim
 
     def __getstate__(self):
         """Vectors are rebuilt from the embedding cache instead of being pickled."""
         state = dict(self.__dict__)
         for name in ("vec_item", "vec_work", "vec_role"):
             state[name] = None
+        state.pop("_analogue_index", None)
         return state
 
     def __setstate__(self, state):
@@ -179,6 +184,22 @@ class World:
         if client == CORE:
             return []
         return [self.space.item_id(topic, c, k) for c in range(self.space.lanes) if c != client]
+
+    def has_analogue(self, agent: int, item: int) -> bool:
+        """Does `agent` hold one of the item's analogues? The same as checking
+        every item of analogues(), but without listing every lane (v6)."""
+        topic, client, k = self.space.item_parts(item)
+        if client == CORE:
+            return False
+        index = self.__dict__.setdefault("_analogue_index", {})
+        if agent not in index:                      # (topic, aspect) -> lanes the agent holds it in
+            lanes: dict[tuple[int, int], set[int]] = {}
+            for held in self.items[agent]:
+                t, c, kk = self.space.item_parts(held)
+                if c != CORE:
+                    lanes.setdefault((t, kk), set()).add(c)
+            index[agent] = lanes
+        return any(c != client for c in index[agent].get((topic, k), ()))
 
     def summary(self) -> dict:
         return dict(self.stats)
@@ -216,11 +237,22 @@ def topic_vectors(space: Space, dim: int, spread: float) -> TopicVectors:
 
 
 def vectors_for(cfg: CompanyConfig):
-    """(item vectors, work vectors, role vectors, embedder name) for a world's tier."""
+    """(item vectors, work vectors, role vectors, embedder name) for a world's tier.
+    With lazy vectors there is no item matrix (None) and the work vectors are a WorkTable."""
     if cfg.tier != "network":
         assert cfg.space() == SPACE_V3, "the text tiers only know the v3 topic space"
         return _base_vectors(cfg.tier)
+    if getattr(cfg, "vector_mode", "dense") == "lazy":
+        tv = lazy_topic_vectors(cfg.space(), cfg.vector_dim, cfg.vector_spread)
+        roles = [("lead", c) for c in range(cfg.space().lanes)] \
+            + [("owner", d) for d in range(cfg.space().domains)] + [("leadership",)]
+        return None, WorkTable(tv), {r: tv.role_vec(r) for r in roles}, "topic-vectors-lazy"
     return _network_vectors(cfg.space(), cfg.vector_dim, cfg.vector_spread)
+
+
+@lru_cache(maxsize=None)
+def lazy_topic_vectors(space: Space, dim: int, spread: float) -> LazyTopicVectors:
+    return LazyTopicVectors(space, dim=dim, lane_spread=spread, aspect_spread=spread)
 
 
 @lru_cache(maxsize=None)
@@ -233,8 +265,11 @@ def _network_vectors(space: Space, dim: int, spread: float):
 
 def question_vec_for(cfg: CompanyConfig, qtype: str, topic: int, client, k: int, variant: int):
     if cfg.tier == "network":
-        return topic_vectors(cfg.space(), cfg.vector_dim, cfg.vector_spread).question_vec(
-            qtype, topic, client, k, variant)
+        if getattr(cfg, "vector_mode", "dense") == "lazy":
+            tv = lazy_topic_vectors(cfg.space(), cfg.vector_dim, cfg.vector_spread)
+        else:
+            tv = topic_vectors(cfg.space(), cfg.vector_dim, cfg.vector_spread)
+        return tv.question_vec(qtype, topic, client, k, variant)
     return question_vectors(cfg.tier)[(qtype, topic, client, k, variant)]
 
 
@@ -262,7 +297,7 @@ class History:
         self.space = cfg.space()
         self.rng = np.random.default_rng(cfg.seed)
         self.vec_item, self.vec_work, self.vec_role, self.embedder_name = vectors_for(cfg)
-        self.dim = self.vec_item.shape[1]
+        self.dim = self.vec_item.shape[1] if self.vec_item is not None else cfg.vector_dim
         self.people: list[Person] = []
         self.teams: list[Team] = []
         self.mem: list[Memory] = []
@@ -270,7 +305,15 @@ class History:
         self.receipts: list[dict] = []
         self.n_max = 4 * cfg.people_at(cfg.quarters) + 50     # id space for memories
         self.central = Memory(self.n_max, self.dim)
+        # indexes kept up to date as people join, move and leave, so that a large
+        # network does not have to be scanned person by person (v6)
+        self.joined_at = np.zeros(self.n_max, dtype=np.int64)
+        self.gone = np.ones(self.n_max, dtype=bool)             # not hired yet, or left
+        self.team_size: dict[int, int] = {}
+        self.n_active = 0
         self.quarter = 0
+        self._work_memo: dict = {}
+        self._roles_of: dict[int, list[tuple]] = {}
         self.topic_rank = self.rng.permutation(self.space.n_topics)   # popularity of topics
         self.n_clients = 0
 
@@ -284,6 +327,25 @@ class History:
 
     def team_members(self, team: int) -> list[Person]:
         return [p for p in self.people if not p.left and p.team == team]
+
+    def members_by_team(self) -> dict[int, list[Person]]:
+        """Everyone active, by team, in order of joining (one pass instead of one per team)."""
+        members: dict[int, list[Person]] = {tm.id: [] for tm in self.teams}
+        for p in self.people:
+            if not p.left:
+                members[p.team].append(p)
+        return members
+
+    def _move(self, p: Person, team: int) -> None:
+        self.team_size[p.team] -= 1
+        self.team_size[team] = self.team_size.get(team, 0) + 1
+        p.team = team
+
+    def _leave(self, p: Person) -> None:
+        p.left = True
+        self.gone[p.id] = True
+        self.team_size[p.team] -= 1
+        self.n_active -= 1
 
     def open_offices(self) -> list[int]:
         return [o for o, q in enumerate(self.cfg.office_opens) if q <= self.quarter]
@@ -304,14 +366,15 @@ class History:
         if self.cfg.n_leadership > 0:
             roles[("leadership",)] = [p.id for p in by_tenure[: self.cfg.n_leadership]]
         lane_members: dict[int, list[Person]] = {}
+        by_team = self.members_by_team()
         for tm in self.teams:
             if tm.kind == "client":
-                lane_members.setdefault(tm.client, []).extend(self.team_members(tm.id))
+                lane_members.setdefault(tm.client, []).extend(by_team[tm.id])
         for lane, members in lane_members.items():
             if members:
                 roles[("lead", lane)] = [min(members, key=lambda p: (p.joined, p.id)).id]
         if self.cfg.stewards == "first_team":
-            core = sorted(self.team_members(0), key=lambda p: (p.joined, p.id))
+            core = sorted(by_team.get(0, []), key=lambda p: (p.joined, p.id))
         else:                                       # v5 open network: whoever knows the domain best
             core = by_tenure
         # core items each candidate holds, per domain
@@ -324,18 +387,30 @@ class History:
                     d = self.space.domain(topic)
                     per_domain[d] = per_domain.get(d, 0) + 1
             core_items.append(per_domain)
+        # per domain: most core items, then earliest joined, then lowest id; if
+        # nobody holds any, the earliest joined (core is in that order). One pass
+        # over the candidates instead of one per domain (same result).
+        best: dict[int, tuple] = {}
+        for p, counts in zip(core, core_items):
+            for d, c in counts.items():
+                key = (c, -p.joined, -p.id)
+                if d not in best or key > best[d][0]:
+                    best[d] = (key, p.id)
         for d in range(self.space.domains):
             if not core:
                 continue
-            held = [(counts.get(d, 0), -p.joined, -p.id, p) for p, counts in zip(core, core_items)]
-            roles[("owner", d)] = [max(held, key=lambda x: x[:3])[3].id]
+            roles[("owner", d)] = [best[d][1] if d in best else core[0].id]
         return roles
 
     def most_senior_known(self, a: int, exclude) -> int | None:
-        known = [b for b in self.mem[a].known() if b not in exclude and not self.people[b].left]
-        if not known:
+        """The longest-serving person a knows who is still here (earliest joined, then lowest id)."""
+        known = self.mem[a].known_ids()
+        known = known[~self.gone[known]]
+        if exclude:
+            known = known[without(known, exclude)]
+        if len(known) == 0:
             return None
-        return min(known, key=lambda b: (self.people[b].joined, b))
+        return int(known[np.lexsort((known, self.joined_at[known]))[0]])
 
     # -- people and teams ------------------------------------------------------
 
@@ -354,14 +429,10 @@ class History:
 
     def _team_weights(self, office: int, exclude: int | None = None) -> tuple[list[Team], np.ndarray]:
         cand, w = [], []
-        sizes: dict[int, int] = {}
-        for p in self.people:
-            if not p.left:
-                sizes[p.team] = sizes.get(p.team, 0) + 1
         for tm in self.teams:
             if tm.id == exclude:
                 continue
-            size = sizes.get(tm.id, 0)
+            size = self.team_size.get(tm.id, 0)
             base = self.cfg.core_weight if tm.kind == "core" else 1.0
             if tm.kind == "service":
                 if size >= self.cfg.service_team_size:
@@ -387,7 +458,11 @@ class History:
         p = Person(len(self.people), office, tm.id, joined)
         p.focus = tm.focus[int(self.rng.integers(len(tm.focus)))]
         self.people.append(p)
-        self.mem.append(Memory(self.n_max, self.dim))
+        self.joined_at[p.id] = joined
+        self.gone[p.id] = False
+        self.team_size[tm.id] = self.team_size.get(tm.id, 0) + 1
+        self.n_active += 1
+        self.mem.append(Memory(self.n_max, self.dim, limit=self.cfg.memory_limit))
         self.role_known.append({})
         self.receipts.append({})
         return p
@@ -406,21 +481,21 @@ class History:
             if self.quarter > 0:
                 movers = [p for p in self.active() if p.office == home] or self.active()
                 for p in rng.choice(movers, size=min(2, len(movers)), replace=False):
-                    p.team = tm.id
+                    self._move(p, tm.id)
         if cfg.service_team_quarter is not None and self.quarter == cfg.service_team_quarter:
             office = self.open_offices()[1] if len(self.open_offices()) > 1 else 0
             self.new_team("service", 0, office)
         # attrition, reassignment, hiring
         for p in self.active():
             if self.quarter > 0 and rng.random() < cfg.attrition_rate:
-                p.left = True
+                self._leave(p)
         for p in self.active():
             if self.quarter > 0 and rng.random() < cfg.reassign_rate:
                 cand, w = self._team_weights(p.office, exclude=p.team)
                 if cand:                          # (a network may start with a single group)
-                    p.team = cand[int(rng.choice(len(cand), p=w))].id
+                    self._move(p, cand[int(rng.choice(len(cand), p=w))].id)
         target = cfg.people_at(self.quarter)
-        while len(self.active()) < target:
+        while self.n_active < target:
             self.hire()
         # team focus moves on
         for tm in self.teams:
@@ -450,7 +525,15 @@ class History:
                 p.worklog.append((self.quarter, p.team, p.focus, client))
 
     def _current_work(self, p: Person) -> list[tuple[int, int]]:
-        return sorted({(t, c) for q, tm, t, c in p.worklog if q == self.quarter})
+        """What p works on this quarter (memoised per quarter: asked once per contact)."""
+        memo = self._work_memo
+        if memo.get("quarter") != self.quarter:
+            memo.clear()
+            memo["quarter"] = self.quarter
+        if p.id not in memo:
+            memo[p.id] = sorted({(t, c) for q, tm, t, c in p.worklog[-4 * self.cfg.items_per_quarter:]
+                                 if q == self.quarter})
+        return memo[p.id]
 
     def _learn_about(self, a: int, b: int, weight: float, all_work: bool) -> None:
         """a sees what b works on now, and b's roles."""
@@ -461,23 +544,39 @@ class History:
             work = [work[int(self.rng.integers(len(work)))]]
         for t, c in work:
             self.mem[a].add(b, self.work_vec(t, c), weight)
-        for role, owners in self.roles.items():
-            if b in owners:
-                self.role_known[a][role] = b
+        for role in self._roles_of.get(b, ()):
+            self.role_known[a][role] = b
 
     def _get_to_know(self) -> None:
         cfg, rng = self.cfg, self.rng
         self.roles = self.roles_now()
+        self._roles_of = {}                        # person -> roles, in the order of self.roles
+        for role, owners in self.roles.items():
+            for b in owners:
+                self._roles_of.setdefault(b, []).append(role)
         act = self.active()
         by_office: dict[int, list[Person]] = {}
         for p in act:
             by_office.setdefault(p.office, []).append(p)
+        by_team = self.members_by_team()
         for tm in self.teams:                      # teammates: everything, every quarter
-            members = self.team_members(tm.id)
+            members = by_team[tm.id]
             for a in members:
                 for b in members:
                     if a.id != b.id:
                         self._learn_about(a.id, b.id, 1.0, all_work=True)
+        if cfg.contacts == "sampled":
+            self._sampled_contacts(act, by_office)
+        else:
+            self._pair_contacts(act, by_office)
+        if ("leadership",) in self.roles:
+            everyone = self.roles[("leadership",)]
+            for p in act:                          # everybody knows who leadership is
+                self.role_known[p.id][("leadership",)] = everyone[0]
+
+    def _pair_contacts(self, act: list[Person], by_office: dict[int, list[Person]]) -> None:
+        """v3-v5: one draw per pair of people (n x n: fine up to a few thousand)."""
+        cfg, rng = self.cfg, self.rng
         for office, ps in by_office.items():       # office colleagues: sometimes
             p_office = min(1.0, cfg.office_mixing / len(ps))
             for a in ps:
@@ -494,10 +593,36 @@ class History:
         cross = other & (rng.random((len(ids), len(ids))) < p_cross)
         for i, j in zip(*np.nonzero(cross)):       # other offices: rarely
             self._learn_about(int(ids[i]), int(ids[j]), 0.5, all_work=False)
-        if ("leadership",) in self.roles:
-            everyone = self.roles[("leadership",)]
-            for p in act:                          # everybody knows who leadership is
-                self.role_known[p.id][("leadership",)] = everyone[0]
+
+    def _sampled_contacts(self, act: list[Person], by_office: dict[int, list[Person]]) -> None:
+        """v6: the same chances as _pair_contacts, drawn per person instead of
+        per pair: first how many contacts (binomial), then which ones (uniform,
+        without repeats). Same distribution, cost grows with n, not n x n."""
+        cfg, rng = self.cfg, self.rng
+        for office, ps in by_office.items():       # office colleagues: sometimes
+            p_office = min(1.0, cfg.office_mixing / len(ps))
+            for ia, a in enumerate(ps):
+                k = int(rng.binomial(len(ps) - 1, p_office))
+                for j in rng.choice(len(ps) - 1, size=k, replace=False):
+                    b = ps[int(j) + (int(j) >= ia)]    # skip a itself
+                    if a.team != b.team:
+                        self._learn_about(a.id, b.id, 0.5, all_work=False)
+        n_act = len(act)
+        offices = np.array([p.office for p in act])
+        size = {o: len(ps) for o, ps in by_office.items()}
+        for ia, a in enumerate(act):               # other offices: rarely
+            n_other = n_act - size[a.office]
+            if n_other <= 0:
+                continue
+            p_cross = cfg.cross_mixing if cfg.cross_contacts is None else cfg.cross_contacts / n_other
+            k = int(rng.binomial(n_other, min(1.0, p_cross)))
+            chosen: list[int] = []
+            while len(chosen) < k:
+                j = int(rng.integers(n_act))
+                if offices[j] != a.office and j not in chosen:
+                    chosen.append(j)
+            for j in chosen:
+                self._learn_about(a.id, act[j].id, 0.5, all_work=False)
 
     # -- asking around, the way the company actually worked -------------------
 
@@ -651,7 +776,10 @@ def calibration_stats(w: World) -> dict:
     n = w.n
     known = [m.known_positive() for m in w.memory]
     cross, office = [], []
-    for a in range(n):
+    # awareness is averaged over everyone, or over 500 agents drawn at random in very
+    # large networks, where checking every pair would take hours (v6)
+    sample = range(n) if n <= 5000 else np.random.default_rng(0).choice(n, 500, replace=False)
+    for a in sample:
         others_cross = [b for b in range(n) if w.office[b] != w.office[a]]
         others_office = [b for b in range(n) if w.office[b] == w.office[a] and b != a]
         if others_cross:
@@ -685,8 +813,14 @@ def calibration_stats(w: World) -> dict:
     }
 
 
+# v6 options at these values change nothing, so they stay out of the cache key
+# (worlds cached by v3-v5 are found again)
+_V6_DEFAULTS = {"contacts": "pairs", "memory_limit": None, "vector_mode": "dense"}
+
+
 def build_world(cfg: CompanyConfig, use_cache: bool = True) -> World:
-    fields = sorted(asdict(cfg).items())
+    fields = [(k, v) for k, v in sorted(asdict(cfg).items())
+              if not (k in _V6_DEFAULTS and v == _V6_DEFAULTS[k])]
     if cfg.tier == "network":                 # the history depends on the vectors, so does the cache
         from .topics import VECTOR_VERSION
         fields.append(("vector_version", VECTOR_VERSION))

@@ -18,7 +18,7 @@ import math
 
 import numpy as np
 
-from .memory import Memory
+from .memory import Memory, without
 from .sim import Query, Sim
 
 
@@ -180,6 +180,18 @@ class AskSenior(Strategy):
 # S3/S4 semantic search over declared skills and public roles
 # --------------------------------------------------------------------------
 
+def hnsw_index(matrix: np.ndarray):
+    """An approximate nearest-neighbour index over unit rows (inner product =
+    cosine). Single-threaded, so that runs stay reproducible."""
+    import faiss
+    faiss.omp_set_num_threads(1)
+    index = faiss.IndexHNSWFlat(matrix.shape[1], 32, faiss.METRIC_INNER_PRODUCT)
+    index.hnsw.efConstruction = 80
+    index.hnsw.efSearch = 128
+    index.add(np.ascontiguousarray(matrix, dtype=np.float32))
+    return index
+
+
 class DeclaredSearch(Strategy):
     """A central index of declared skills (AgentFacts) plus a public role
     directory; cosine top-k. Contacted people answer or say they don't know."""
@@ -196,6 +208,10 @@ class DeclaredSearch(Strategy):
                 owners.append(a)
         self.matrix = np.stack(rows)
         self.owners = np.array(owners)
+        self.index = None
+        if sim.cfg.search_index == "hnsw":   # v6: approximate nearest rows, for very large networks
+            self.index = hnsw_index(self.matrix)
+            self.rows = sim.cfg.search_rows
         # rows are grouped by agent: where each agent's rows start (for a fast per-agent maximum)
         self.row_agents, self.row_starts = np.unique(self.owners, return_index=True)
         # answers given so far, starting from the history's receipts
@@ -203,6 +219,8 @@ class DeclaredSearch(Strategy):
                                    dtype=float)
 
     def ranked(self, sim, vec, exclude) -> list[tuple[int, float]]:
+        if self.index is not None:
+            return self._ranked_approx(vec, exclude)
         cos = self.matrix @ vec
         best = np.full(sim.n, -np.inf)
         best[self.row_agents] = np.maximum.reduceat(cos, self.row_starts)   # each agent's best row
@@ -211,6 +229,20 @@ class DeclaredSearch(Strategy):
         order = np.argsort(-best)
         order = order[np.isfinite(best[order])]
         return list(zip(order.tolist(), best[order].tolist()))
+
+    def _ranked_approx(self, vec, exclude) -> list[tuple[int, float]]:
+        """The agents behind the nearest `rows` declared rows, best first: the
+        same list as the exact search, cut after those rows (a search with
+        HNSW can also miss a near row now and then)."""
+        sims, rows = self.index.search(np.asarray(vec, dtype=np.float32)[None, :], self.rows)
+        best: dict[int, float] = {}
+        for r, s in zip(rows[0].tolist(), sims[0].tolist()):
+            if r < 0:
+                continue
+            a = int(self.owners[r])
+            if a not in exclude and s > best.get(a, -np.inf):
+                best[a] = s
+        return sorted(best.items(), key=lambda cs: (-cs[1], -cs[0]))
 
     def next_candidate(self, sim, q):
         excl = set(q.asked) | {q.asker}
@@ -282,11 +314,18 @@ class Learned(Strategy):
     def _top(self, agent, vec, k, exclude):
         if self.shared is None:
             return self.mem[agent].top(vec, k, exclude=exclude)
-        sc = self.mem[agent].scores(vec)
-        for t, v in self.shared.scores(vec).items():
-            sc[t] = max(sc.get(t, -np.inf), v)
-        ranked = sorted(((v, t) for t, v in sc.items() if t not in exclude), reverse=True)
-        return [(t, v) for v, t in ranked[:k]]
+        # own notes and the shared log, the better score per agent; best first,
+        # ties to the higher id (in arrays: the log knows nearly everyone)
+        a1, s1 = self.mem[agent].score_arrays(vec)
+        a2, s2 = self.shared.score_arrays(vec)
+        agents, slot = np.unique(np.concatenate([a1, a2]), return_inverse=True)
+        score = np.full(len(agents), -np.inf)
+        np.maximum.at(score, slot, np.concatenate([s1, s2]))
+        if exclude:
+            keep = without(agents, exclude)
+            agents, score = agents[keep], score[keep]
+        order = np.lexsort((-agents, -score))[:k]
+        return list(zip(agents[order].tolist(), score[order].tolist()))
 
     def _learn(self, observer, target, vec, weight, sign=1):
         (self.shared if self.shared is not None else self.mem[observer]).add(target, vec, weight, sign)

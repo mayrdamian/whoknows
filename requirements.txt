@@ -2,6 +2,7 @@ numpy>=1.26
 pandas>=2.0
 matplotlib>=3.8
 scipy>=1.11
+faiss-cpu>=1.8      # v6: approximate search index for large networks (search_index="hnsw")
 pytest>=8
 spacy>=3.7
 # word vectors for the text tier (from spaCy's GitHub releases):

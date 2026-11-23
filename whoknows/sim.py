@@ -101,6 +101,15 @@ class SimConfig:
     t_triage: float = 0.1             # reading an ask only to rank it
     audit_share: float = 0.2          # audit: share of labelled asks the receiver checks
     budget_share: float = 0.25        # budget: high labels per asker = this share of the questions they expect to ask
+    # -- v6 (Phase 3): for very large networks; the defaults reproduce v5 exactly ---
+    search_index: str = "exact"       # exact: score every declared row; hnsw: approximate nearest rows (faiss)
+    search_rows: int = 256            # hnsw: how many nearest rows a search looks at
+    own_work_events: str = "upfront"  # upfront: all blocks of own work queued at the start; lazy: one at a time
+    peak_window: float | None = None  # spread the deadline peaks over this long a stretch, of which the run
+                                      # sees the middle (None: over the run itself, as in v3-v5)
+    question_topics: str = "tries"    # tries: draw a topic by popularity, up to 30 times, until someone
+                                      # holds it in the lane asked about (else no question); held: draw
+                                      # among the topics held in that lane (same popularity, no drops)
 
 
 @dataclass
@@ -248,7 +257,11 @@ class Sim:
         self._schedule_questions()
         # own work only while asks are still moving between agents; after that
         # only human approvals and the answers they release are left
-        self._schedule_own_work(self.cfg.horizon + self.cfg.deadline + self.cfg.patience)
+        own_end = self.cfg.horizon + self.cfg.deadline + self.cfg.patience
+        if self.cfg.own_work_events == "lazy":
+            self._schedule_own_work_lazy(own_end)
+        else:
+            self._schedule_own_work(own_end)
         if self.cfg.dropout_at is not None:
             self.at(self.cfg.dropout_at, self._dropout)
         self.at(self.cfg.horizon, self._snapshot)
@@ -267,10 +280,17 @@ class Sim:
 
     def _schedule_questions(self) -> None:
         w, cfg, rng = self.world, self.cfg, self.rng
-        n_topics = w.vec_work.shape[0]
+        n_topics = w.space.n_topics
         pop = 1.0 / (rng.permutation(n_topics) + 1) ** cfg.zipf_a
         pop /= pop.sum()
+        # Drawing a topic from this cumulative table is what rng.choice(len(pop), p=pop)
+        # does internally, without rebuilding the table for every question.
+        self._topic_cdf = pop.cumsum()
+        self._topic_cdf /= self._topic_cdf[-1]
+        if cfg.question_topics == "held":
+            self._held_cdf = self._held_topic_tables(pop)
         clients = sorted({int(c) for c in w.team_client if c >= 0})
+        self._client_position = {c: i for i, c in enumerate(clients)}
         rate = cfg.questions_per_day * self.n / cfg.day
         t, qid = 0.0, 0
         while True:
@@ -293,13 +313,12 @@ class Sim:
         if u < cfg.own_system:
             system = own
         elif u < cfg.own_system + cfg.core_system:
-            system = CORE if own != CORE else int(rng.choice(clients))
+            system = CORE if own != CORE else clients[int(rng.integers(len(clients)))]
         else:
-            others = [c for c in clients if c != own]
-            system = int(rng.choice(others)) if others else own
+            system = self._other_client(clients, own)
         variant = int(rng.integers(3))
         if qtype == "decision":
-            topic = int(rng.choice(len(pop), p=pop))
+            topic = self._draw_topic()
             if rng.random() < cfg.company_decisions:
                 system = None
             role = w.owner_role(system, topic)
@@ -308,7 +327,7 @@ class Sim:
             vec = w.question_vec("decision", topic, system, 0, variant)
             return Query(qid, asker, qtype, t, topic, system, variant, [], role, vec)
         for _ in range(30):
-            topic = int(rng.choice(len(pop), p=pop))
+            topic = self._draw_topic(system)
             first = self._held_item(topic, system, asker)
             if first is None:
                 continue
@@ -344,6 +363,46 @@ class Sim:
         q.needs_human = cfg.approvals and q.qtype == "decision" and u[3] < cfg.p_human_decision
         q.deadline = cfg.deadline_human if q.needs_human else cfg.deadline
 
+    def _draw_topic(self, system=None) -> int:
+        if system is not None and self.cfg.question_topics == "held":
+            table = self._held_cdf.get(system)
+            if table is None:
+                return self._draw_topic()
+            topics, cdf = table
+            return int(topics[cdf.searchsorted(self.rng.random(), side="right")])
+        return int(self._topic_cdf.searchsorted(self.rng.random(), side="right"))
+
+    def _held_topic_tables(self, pop: np.ndarray) -> dict:
+        """v6: per lane, the topics someone holds there and their cumulative
+        popularity. Drawing from it is the same as drawing by popularity until
+        the topic is held in the lane, without a limit on the tries.
+
+        Why: the topic space of large networks grows with the network, so each
+        lane covers a smaller share of all topics; with 30 tries, half of all
+        questions at 10,000 agents found no topic and were dropped (7 % at
+        1,000), which would have halved the load in large networks."""
+        space = self.world.space
+        by_system: dict[int, set[int]] = {}
+        for item in self.world.holders:
+            topic, lane, _ = space.item_parts(item)
+            by_system.setdefault(lane, set()).add(topic)
+        tables = {}
+        for lane, topics in by_system.items():
+            topics = np.array(sorted(topics))
+            cdf = pop[topics].cumsum()
+            tables[lane] = (topics, cdf / cdf[-1])
+        return tables
+
+    def _other_client(self, clients: list[int], own: int) -> int:
+        """A random client other than `own` (the same draw as rng.choice of that list)."""
+        position = self._client_position.get(own)
+        if position is None:
+            return clients[int(self.rng.integers(len(clients)))] if clients else own
+        if len(clients) == 1:
+            return own
+        j = int(self.rng.integers(len(clients) - 1))
+        return clients[j if j < position else j + 1]
+
     def _held_item(self, topic, system, asker) -> int | None:
         """A random aspect of (topic, system) that someone other than the asker holds."""
         ks = self.rng.permutation(self.world.space.aspects)
@@ -359,7 +418,7 @@ class Sim:
         cfg, rng = self.cfg, self.rng
         self.peak_start = {}
         for tm in sorted(set(self.world.team.tolist())):
-            self.peak_start[tm] = rng.uniform(0, max(1.0, cfg.horizon - cfg.peak_length))
+            self.peak_start[tm] = self._peak_start(rng)
         peak_start = self.peak_start
         top = max(cfg.own_work, cfg.peak_work if cfg.peaks else 0.0)
         if top <= 0:
@@ -375,6 +434,51 @@ class Sim:
                 share = cfg.peak_work if (cfg.peaks and ps <= t < ps + cfg.peak_length) else cfg.own_work
                 if rng.random() < share / top:
                     self.at(t, self._own_work_arrives, a, float(rng.exponential(cfg.own_block)))
+
+    def _peak_start(self, rng) -> float:
+        """When a team's deadline peak starts. Peaks are spread over the run; a
+        run shorter than a peak would otherwise put every team in its peak at
+        once, so v6's short runs spread them over a longer window (peak_window)
+        and look at its middle."""
+        cfg = self.cfg
+        if cfg.peak_window is None:
+            return rng.uniform(0, max(1.0, cfg.horizon - cfg.peak_length))
+        offset = (cfg.peak_window - cfg.horizon) / 2
+        return rng.uniform(0, max(1.0, cfg.peak_window - cfg.peak_length)) - offset
+
+    def _schedule_own_work_lazy(self, end: float) -> None:
+        """v6: the same blocks of own work (same rates, same peaks), but each
+        agent's next block is drawn when the previous one arrives, from a
+        random stream of its own. The event queue then holds one block per
+        agent instead of a few hundred (a network of 100,000 agents would
+        otherwise queue tens of millions of events at the start)."""
+        cfg = self.cfg
+        self.peak_start = {}
+        for tm in sorted(set(self.world.team.tolist())):
+            self.peak_start[tm] = self._peak_start(self.rng)
+        top = max(cfg.own_work, cfg.peak_work if cfg.peaks else 0.0)
+        if top <= 0:
+            return
+        self._own_rng = np.random.default_rng((cfg.seed, 13))
+        self._own_end, self._own_top = end, top
+        for a in range(self.n):
+            self._next_own_work(a, 0.0)
+
+    def _next_own_work(self, a: int, t: float) -> None:
+        cfg, rng = self.cfg, self._own_rng
+        ps = self.peak_start[int(self.world.team[a])]
+        while True:
+            t += rng.exponential(cfg.own_block / self._own_top)
+            if t > self._own_end:
+                return
+            share = cfg.peak_work if (cfg.peaks and ps <= t < ps + cfg.peak_length) else cfg.own_work
+            if rng.random() < share / self._own_top:
+                self.at(t, self._own_work_lazy, a, float(rng.exponential(cfg.own_block)))
+                return
+
+    def _own_work_lazy(self, a: int, length: float) -> None:
+        self._own_work_arrives(a, length)
+        self._next_own_work(a, self.now)
 
     def in_peak(self, a: int) -> bool:
         if not self.cfg.peaks:
@@ -625,7 +729,7 @@ class Sim:
                 u = self._draw(b, q, item)
                 if item in w.items[b]:
                     covers[item] = u < cfg.p_correct
-                elif any(a in w.items[b] for a in w.analogues(item)):
+                elif w.has_analogue(b, item):
                     if u < cfg.p_analog:
                         covers[item] = True
                     elif u < cfg.p_analog + cfg.p_analog_wrong:
