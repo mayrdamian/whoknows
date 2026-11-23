@@ -1,0 +1,937 @@
+# Key numbers for the v6 write-ups (computed from runs.csv)
+
+## p3_gate / agents, v6 options / Declared search (5 seeds)
+- correct: 66.5 % ± 4.3
+- wrong: 6.5 % ± 1.0
+- top5_share_inbox: 31.6 % ± 2.4
+- top1_share_inbox: 11.8 % ± 1.5
+- top5_share_reads: 30.7 % ± 2.2
+- reads_per_query: 3.44 ± 0.17
+- rejected_per_query: 0.43 ± 0.02
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 15.7 s ± 1.6
+- latency_p90: 46.7 s ± 3.4
+- correct_undeclared: 25.5 % ± 3.8
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 67.0 % ± 4.9
+- correct_others: 66.4 % ± 4.2
+- found_ratio_newcomers: 3.80 ± 0.41
+- asked_ratio_newcomers: 4.01 ± 0.36
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 14.9 s ± 1.3
+- latency_low_median: 16.2 s ± 1.9
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.8 % ± 0.4
+- runtime_s: 53 s ± 3
+
+## p3_gate / agents, v6 options / Declared search, trust-ranked (5 seeds)
+- correct: 62.2 % ± 3.6
+- wrong: 10.2 % ± 0.9
+- top5_share_inbox: 36.2 % ± 2.0
+- top1_share_inbox: 13.7 % ± 1.2
+- top5_share_reads: 34.8 % ± 1.6
+- reads_per_query: 3.44 ± 0.19
+- rejected_per_query: 0.46 ± 0.03
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 18.4 s ± 2.0
+- latency_p90: 50.6 s ± 4.9
+- correct_undeclared: 26.1 % ± 4.1
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 62.3 % ± 3.5
+- correct_others: 62.1 % ± 3.7
+- found_ratio_newcomers: 1.85 ± 0.31
+- asked_ratio_newcomers: 2.40 ± 0.39
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 16.5 s ± 1.7
+- latency_low_median: 19.7 s ± 2.1
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.0 % ± 0.5
+- runtime_s: 56 s ± 3
+
+## p3_gate / agents, v6 options / Phonebook (5 seeds)
+- correct: 21.3 % ± 0.9
+- wrong: 2.9 % ± 0.4
+- top5_share_inbox: 11.4 % ± 0.5
+- top1_share_inbox: 2.9 % ± 0.2
+- top5_share_reads: 11.4 % ± 0.5
+- reads_per_query: 5.96 ± 0.06
+- rejected_per_query: 0.59 ± 0.01
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 10.5 s ± 0.2
+- latency_p90: 33.4 s ± 0.8
+- correct_undeclared: 16.0 % ± 2.0
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 13.7 % ± 0.7
+- correct_others: 24.6 % ± 1.1
+- found_ratio_newcomers: 1.35 ± 0.18
+- asked_ratio_newcomers: 2.45 ± 0.08
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 10.5 s ± 0.7
+- latency_low_median: 10.6 s ± 0.4
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 0.4 % ± 0.1
+- runtime_s: 53 s ± 6
+
+## p3_gate / agents, v6 options / Ask the senior / oldest agent (5 seeds)
+- correct: 35.8 % ± 1.7
+- wrong: 8.4 % ± 0.7
+- top5_share_inbox: 83.6 % ± 1.1
+- top1_share_inbox: 67.3 % ± 0.6
+- top5_share_reads: 67.7 % ± 2.3
+- reads_per_query: 2.88 ± 0.05
+- rejected_per_query: 3.32 ± 0.05
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 36.3 s ± 0.2
+- latency_p90: 67.0 s ± 1.1
+- correct_undeclared: 32.8 % ± 2.3
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 34.1 % ± 1.5
+- correct_others: 36.5 % ± 1.8
+- found_ratio_newcomers: 0.43 ± 0.15
+- asked_ratio_newcomers: 0.12 ± 0.04
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 35.1 s ± 0.3
+- latency_low_median: 37.1 s ± 0.7
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 14.0 % ± 0.1
+- runtime_s: 69 s ± 5
+
+## p3_gate / agents, v6 options / Learned, local, load-aware (5 seeds)
+- correct: 54.0 % ± 1.7
+- wrong: 9.1 % ± 0.4
+- top5_share_inbox: 37.1 % ± 1.1
+- top1_share_inbox: 15.7 % ± 1.8
+- top5_share_reads: 37.1 % ± 1.1
+- reads_per_query: 4.81 ± 0.08
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 1.01 ± 0.05
+- latency_median: 13.9 s ± 0.4
+- latency_p90: 35.5 s ± 0.8
+- correct_undeclared: 48.8 % ± 2.9
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 53.2 % ± 1.6
+- correct_others: 54.3 % ± 1.7
+- found_ratio_newcomers: 0.92 ± 0.08
+- asked_ratio_newcomers: 1.04 ± 0.09
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 15.3 s ± 0.6
+- latency_low_median: 13.5 s ± 0.4
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.3 % ± 0.4
+- runtime_s: 81 s ± 5
+
+## p3_gate / agents, v6 options / Search + learned (hybrid) (5 seeds)
+- correct: 71.4 % ± 1.5
+- wrong: 8.8 % ± 0.5
+- top5_share_inbox: 33.2 % ± 2.5
+- top1_share_inbox: 12.3 % ± 2.0
+- top5_share_reads: 33.3 % ± 2.5
+- reads_per_query: 3.53 ± 0.08
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 0.74 ± 0.04
+- latency_median: 12.8 s ± 0.4
+- latency_p90: 33.4 s ± 0.6
+- correct_undeclared: 52.2 % ± 2.2
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 70.8 % ± 2.0
+- correct_others: 71.6 % ± 1.4
+- found_ratio_newcomers: 1.94 ± 0.18
+- asked_ratio_newcomers: 2.22 ± 0.28
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 13.3 s ± 0.7
+- latency_low_median: 12.8 s ± 0.4
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.6 % ± 0.4
+- runtime_s: 77 s ± 4
+
+## p3_gate / agents, v6 options / Signed track records (5 seeds)
+- correct: 73.0 % ± 1.5
+- wrong: 9.1 % ± 0.7
+- top5_share_inbox: 35.7 % ± 2.6
+- top1_share_inbox: 13.9 % ± 1.7
+- top5_share_reads: 35.7 % ± 2.6
+- reads_per_query: 3.38 ± 0.09
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 0.74 ± 0.04
+- latency_median: 13.1 s ± 0.4
+- latency_p90: 33.9 s ± 1.0
+- correct_undeclared: 54.5 % ± 1.4
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 72.3 % ± 1.8
+- correct_others: 73.3 % ± 1.4
+- found_ratio_newcomers: 1.94 ± 0.24
+- asked_ratio_newcomers: 2.31 ± 0.32
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 13.5 s ± 0.5
+- latency_low_median: 12.9 s ± 0.5
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.1 % ± 0.4
+- runtime_s: 75 s ± 2
+
+## p3_gate / agents, v6 options / Learned, central log (5 seeds)
+- correct: 55.0 % ± 2.7
+- wrong: 14.7 % ± 0.9
+- top5_share_inbox: 55.5 % ± 3.5
+- top1_share_inbox: 27.0 % ± 5.7
+- top5_share_reads: 52.6 % ± 2.8
+- reads_per_query: 3.33 ± 0.06
+- rejected_per_query: 0.60 ± 0.10
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 17.2 s ± 0.7
+- latency_p90: 53.4 s ± 2.5
+- correct_undeclared: 50.7 % ± 4.1
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 54.1 % ± 2.7
+- correct_others: 55.5 % ± 2.7
+- found_ratio_newcomers: 0.76 ± 0.07
+- asked_ratio_newcomers: 0.41 ± 0.07
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 16.1 s ± 0.9
+- latency_low_median: 18.2 s ± 0.9
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 4.4 % ± 1.3
+- runtime_s: 295 s ± 16
+
+## p3_gate / agents, v6 options / Learned, local (5 seeds)
+- correct: 56.1 % ± 1.7
+- wrong: 9.1 % ± 0.6
+- top5_share_inbox: 41.6 % ± 1.6
+- top1_share_inbox: 18.2 % ± 2.2
+- top5_share_reads: 39.4 % ± 1.7
+- reads_per_query: 4.02 ± 0.08
+- rejected_per_query: 0.58 ± 0.07
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 18.4 s ± 0.8
+- latency_p90: 53.5 s ± 0.7
+- correct_undeclared: 52.3 % ± 1.6
+- newcomer_share: 30.2 % ± 0.5
+- correct_newcomers: 54.9 % ± 1.9
+- correct_others: 56.6 % ± 1.6
+- found_ratio_newcomers: 0.87 ± 0.11
+- asked_ratio_newcomers: 0.80 ± 0.08
+- known_by_newcomers: 30.5 ± 0.4
+- known_by_others: 90.3 ± 2.4
+- latency_high_median: 19.6 s ± 1.1
+- latency_low_median: 17.9 s ± 0.7
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.9 % ± 0.5
+- runtime_s: 62 s ± 3
+
+## p3_size / agents=1000, Phase 2 questions / Phonebook (3 seeds)
+- correct: 21.5 % ± 0.9
+- wrong: 2.9 % ± 1.2
+- top5_share_inbox: 11.7 % ± 1.0
+- top1_share_inbox: 3.1 % ± 0.5
+- top5_share_reads: 12.1 % ± 1.1
+- reads_per_query: 5.98 ± 0.07
+- rejected_per_query: 0.57 ± 0.06
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 10.5 s ± 0.7
+- latency_p90: 33.4 s ± 2.5
+- correct_undeclared: 17.2 % ± 3.7
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 14.5 % ± 1.0
+- correct_others: 24.5 % ± 1.3
+- found_ratio_newcomers: 1.39 ± 0.26
+- asked_ratio_newcomers: 2.45 ± 0.13
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 11.1 s ± 0.7
+- latency_low_median: 11.0 s ± 2.6
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 0.4 % ± 0.1
+- runtime_s: 11 s ± 6
+
+## p3_size / agents=1000, Phase 2 questions / Ask the senior / oldest agent (3 seeds)
+- correct: 32.9 % ± 9.1
+- wrong: 7.2 % ± 2.0
+- top5_share_inbox: 82.8 % ± 6.4
+- top1_share_inbox: 66.2 % ± 8.3
+- top5_share_reads: 67.6 % ± 5.9
+- reads_per_query: 3.11 ± 0.34
+- rejected_per_query: 3.31 ± 0.85
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 36.9 s ± 3.1
+- latency_p90: 67.2 s ± 8.3
+- correct_undeclared: 30.5 % ± 8.5
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 30.9 % ± 10.9
+- correct_others: 33.7 % ± 8.4
+- found_ratio_newcomers: 0.48 ± 0.31
+- asked_ratio_newcomers: 0.10 ± 0.07
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 36.3 s ± 3.2
+- latency_low_median: 37.6 s ± 3.1
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 13.9 % ± 0.7
+- runtime_s: 16 s ± 6
+
+## p3_size / agents=1000, Phase 2 questions / Declared search (3 seeds)
+- correct: 66.4 % ± 6.5
+- wrong: 6.4 % ± 2.7
+- top5_share_inbox: 32.5 % ± 4.3
+- top1_share_inbox: 12.6 % ± 1.1
+- top5_share_reads: 32.5 % ± 6.2
+- reads_per_query: 3.44 ± 0.37
+- rejected_per_query: 0.40 ± 0.14
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 15.1 s ± 3.4
+- latency_p90: 46.4 s ± 12.7
+- correct_undeclared: 26.4 % ± 10.1
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 66.6 % ± 5.3
+- correct_others: 66.3 % ± 7.1
+- found_ratio_newcomers: 3.80 ± 1.32
+- asked_ratio_newcomers: 3.93 ± 1.06
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 14.9 s ± 3.4
+- latency_low_median: 15.5 s ± 3.6
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.9 % ± 0.7
+- runtime_s: 15 s ± 12
+
+## p3_size / agents=1000, Phase 2 questions / Declared search, trust-ranked (3 seeds)
+- correct: 62.0 % ± 4.7
+- wrong: 10.1 % ± 2.9
+- top5_share_inbox: 35.8 % ± 4.4
+- top1_share_inbox: 14.1 % ± 2.4
+- top5_share_reads: 35.6 % ± 3.7
+- reads_per_query: 3.48 ± 0.37
+- rejected_per_query: 0.42 ± 0.18
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 17.4 s ± 5.0
+- latency_p90: 49.5 s ± 14.1
+- correct_undeclared: 26.5 % ± 10.8
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 62.1 % ± 2.7
+- correct_others: 62.0 % ± 5.6
+- found_ratio_newcomers: 2.11 ± 1.11
+- asked_ratio_newcomers: 2.61 ± 1.03
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 16.1 s ± 4.6
+- latency_low_median: 18.6 s ± 5.2
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.2 % ± 0.7
+- runtime_s: 16 s ± 11
+
+## p3_size / agents=1000, Phase 2 questions / Learned, local, load-aware (3 seeds)
+- correct: 48.6 % ± 3.5
+- wrong: 8.0 % ± 0.5
+- top5_share_inbox: 28.3 % ± 2.2
+- top1_share_inbox: 9.9 % ± 2.6
+- top5_share_reads: 28.3 % ± 2.2
+- reads_per_query: 5.33 ± 0.26
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 0.99 ± 0.08
+- latency_median: 14.6 s ± 0.5
+- latency_p90: 36.2 s ± 2.4
+- correct_undeclared: 44.3 % ± 0.8
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 46.2 % ± 4.0
+- correct_others: 49.7 % ± 3.4
+- found_ratio_newcomers: 1.04 ± 0.57
+- asked_ratio_newcomers: 1.18 ± 0.40
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 16.3 s ± 1.7
+- latency_low_median: 14.2 s ± 1.6
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.4 % ± 0.7
+- runtime_s: 20 s ± 9
+
+## p3_size / agents=1000, Phase 2 questions / Search + learned (hybrid) (3 seeds)
+- correct: 70.8 % ± 0.8
+- wrong: 8.3 % ± 1.2
+- top5_share_inbox: 30.4 % ± 2.5
+- top1_share_inbox: 11.7 % ± 3.3
+- top5_share_reads: 30.4 % ± 2.5
+- reads_per_query: 3.65 ± 0.04
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 0.72 ± 0.14
+- latency_median: 13.0 s ± 0.5
+- latency_p90: 34.3 s ± 2.3
+- correct_undeclared: 49.7 % ± 3.8
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 69.8 % ± 0.6
+- correct_others: 71.2 % ± 1.1
+- found_ratio_newcomers: 2.05 ± 0.55
+- asked_ratio_newcomers: 2.33 ± 0.73
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 13.6 s ± 0.3
+- latency_low_median: 12.5 s ± 0.6
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.6 % ± 1.1
+- runtime_s: 19 s ± 10
+
+## p3_size / agents=1000, Phase 2 questions / Learned, central log (3 seeds)
+- correct: 53.6 % ± 2.8
+- wrong: 13.7 % ± 1.2
+- top5_share_inbox: 59.3 % ± 5.5
+- top1_share_inbox: 29.1 % ± 5.1
+- top5_share_reads: 56.6 % ± 1.6
+- reads_per_query: 3.49 ± 0.07
+- rejected_per_query: 0.66 ± 0.12
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 17.1 s ± 2.3
+- latency_p90: 54.5 s ± 8.3
+- correct_undeclared: 49.7 % ± 4.3
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 52.7 % ± 5.3
+- correct_others: 54.0 % ± 2.2
+- found_ratio_newcomers: 0.85 ± 0.27
+- asked_ratio_newcomers: 0.41 ± 0.05
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 16.1 s ± 1.3
+- latency_low_median: 17.7 s ± 1.3
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 5.2 % ± 1.1
+- runtime_s: 43 s ± 20
+
+## p3_size / agents=1000, Phase 2 questions / Learned, local (3 seeds)
+- correct: 50.7 % ± 2.3
+- wrong: 8.1 % ± 1.1
+- top5_share_inbox: 33.2 % ± 4.7
+- top1_share_inbox: 13.0 % ± 3.5
+- top5_share_reads: 33.0 % ± 3.8
+- reads_per_query: 4.61 ± 0.18
+- rejected_per_query: 0.49 ± 0.03
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 19.0 s ± 0.9
+- latency_p90: 53.2 s ± 3.1
+- correct_undeclared: 47.5 % ± 4.0
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 48.7 % ± 3.1
+- correct_others: 51.5 % ± 3.1
+- found_ratio_newcomers: 0.90 ± 0.16
+- asked_ratio_newcomers: 0.91 ± 0.19
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 21.4 s ± 0.5
+- latency_low_median: 18.2 s ± 0.2
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.1 % ± 1.2
+- runtime_s: 15 s ± 4
+
+## p3_size / agents=1000, Phase 2 questions / Signed track records (3 seeds)
+- correct: 71.0 % ± 3.3
+- wrong: 8.9 % ± 1.6
+- top5_share_inbox: 33.4 % ± 4.2
+- top1_share_inbox: 13.6 % ± 2.7
+- top5_share_reads: 33.4 % ± 4.2
+- reads_per_query: 3.53 ± 0.10
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 0.69 ± 0.16
+- latency_median: 13.0 s ± 0.7
+- latency_p90: 34.3 s ± 1.8
+- correct_undeclared: 50.8 % ± 7.2
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 70.1 % ± 3.9
+- correct_others: 71.4 % ± 3.0
+- found_ratio_newcomers: 1.97 ± 0.65
+- asked_ratio_newcomers: 2.30 ± 0.75
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 13.8 s ± 1.0
+- latency_low_median: 13.0 s ± 0.8
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.2 % ± 1.5
+- runtime_s: 16 s ± 1
+
+## p3_size / agents=1000 / Declared search (3 seeds)
+- correct: 65.2 % ± 7.0
+- wrong: 6.5 % ± 1.7
+- top5_share_inbox: 32.4 % ± 6.3
+- top1_share_inbox: 12.0 % ± 0.8
+- top5_share_reads: 32.2 % ± 4.3
+- reads_per_query: 3.57 ± 0.50
+- rejected_per_query: 0.36 ± 0.23
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 15.4 s ± 3.7
+- latency_p90: 46.5 s ± 10.3
+- correct_undeclared: 26.4 % ± 10.8
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 66.2 % ± 6.7
+- correct_others: 64.8 % ± 7.1
+- found_ratio_newcomers: 3.94 ± 0.84
+- asked_ratio_newcomers: 3.89 ± 1.09
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 14.4 s ± 2.9
+- latency_low_median: 16.1 s ± 5.5
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.9 % ± 0.3
+- runtime_s: 14 s ± 2
+
+## p3_size / agents=1000 / Declared search, trust-ranked (3 seeds)
+- correct: 61.1 % ± 5.9
+- wrong: 10.5 % ± 3.1
+- top5_share_inbox: 35.2 % ± 8.5
+- top1_share_inbox: 13.2 % ± 1.3
+- top5_share_reads: 35.3 % ± 6.3
+- reads_per_query: 3.60 ± 0.42
+- rejected_per_query: 0.35 ± 0.16
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 18.3 s ± 5.8
+- latency_p90: 49.9 s ± 12.4
+- correct_undeclared: 26.3 % ± 10.7
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 62.0 % ± 5.8
+- correct_others: 60.7 % ± 5.9
+- found_ratio_newcomers: 2.13 ± 0.84
+- asked_ratio_newcomers: 2.58 ± 0.88
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 16.5 s ± 5.2
+- latency_low_median: 19.3 s ± 6.2
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.9 % ± 0.8
+- runtime_s: 14 s ± 2
+
+## p3_size / agents=1000 / Phonebook (3 seeds)
+- correct: 21.3 % ± 1.2
+- wrong: 3.2 % ± 1.0
+- top5_share_inbox: 11.5 % ± 0.7
+- top1_share_inbox: 3.0 % ± 0.3
+- top5_share_reads: 11.7 % ± 0.4
+- reads_per_query: 5.96 ± 0.37
+- rejected_per_query: 0.58 ± 0.29
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 10.4 s ± 1.1
+- latency_p90: 33.9 s ± 4.6
+- correct_undeclared: 16.8 % ± 4.3
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 14.2 % ± 1.9
+- correct_others: 24.4 % ± 1.4
+- found_ratio_newcomers: 1.48 ± 0.35
+- asked_ratio_newcomers: 2.47 ± 0.28
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 10.7 s ± 0.9
+- latency_low_median: 10.6 s ± 3.5
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 0.4 % ± 0.1
+- runtime_s: 9 s ± 1
+
+## p3_size / agents=1000 / Ask the senior / oldest agent (3 seeds)
+- correct: 29.9 % ± 10.5
+- wrong: 6.9 % ± 2.7
+- top5_share_inbox: 84.1 % ± 7.1
+- top1_share_inbox: 68.9 % ± 8.1
+- top5_share_reads: 66.9 % ± 7.4
+- reads_per_query: 2.90 ± 0.45
+- rejected_per_query: 3.72 ± 0.92
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 35.7 s ± 3.1
+- latency_p90: 64.9 s ± 9.4
+- correct_undeclared: 27.8 % ± 11.0
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 28.2 % ± 10.2
+- correct_others: 30.6 % ± 10.9
+- found_ratio_newcomers: 0.52 ± 0.27
+- asked_ratio_newcomers: 0.10 ± 0.08
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 34.6 s ± 2.9
+- latency_low_median: 36.4 s ± 3.7
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 13.5 % ± 0.7
+- runtime_s: 15 s ± 1
+
+## p3_size / agents=1000 / Learned, central log (3 seeds)
+- correct: 53.3 % ± 3.7
+- wrong: 13.4 % ± 1.7
+- top5_share_inbox: 57.0 % ± 2.9
+- top1_share_inbox: 28.0 % ± 4.0
+- top5_share_reads: 53.2 % ± 1.7
+- reads_per_query: 3.49 ± 0.34
+- rejected_per_query: 0.68 ± 0.53
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 17.5 s ± 4.7
+- latency_p90: 55.1 s ± 8.8
+- correct_undeclared: 48.1 % ± 8.4
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 52.5 % ± 2.6
+- correct_others: 53.6 % ± 4.4
+- found_ratio_newcomers: 0.88 ± 0.28
+- asked_ratio_newcomers: 0.48 ± 0.14
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 15.9 s ± 2.8
+- latency_low_median: 18.7 s ± 7.0
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 5.3 % ± 2.1
+- runtime_s: 41 s ± 5
+
+## p3_size / agents=1000 / Learned, local (3 seeds)
+- correct: 50.9 % ± 4.1
+- wrong: 8.3 % ± 0.2
+- top5_share_inbox: 32.7 % ± 0.7
+- top1_share_inbox: 11.5 % ± 1.2
+- top5_share_reads: 32.1 % ± 1.1
+- reads_per_query: 4.59 ± 0.28
+- rejected_per_query: 0.49 ± 0.22
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 19.4 s ± 2.4
+- latency_p90: 53.9 s ± 4.3
+- correct_undeclared: 48.3 % ± 6.1
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 49.4 % ± 4.8
+- correct_others: 51.5 % ± 4.0
+- found_ratio_newcomers: 0.92 ± 0.40
+- asked_ratio_newcomers: 0.91 ± 0.24
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 20.8 s ± 3.3
+- latency_low_median: 19.1 s ± 4.1
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.7 % ± 0.4
+- runtime_s: 17 s ± 4
+
+## p3_size / agents=1000 / Learned, local, load-aware (3 seeds)
+- correct: 47.6 % ± 2.6
+- wrong: 8.1 % ± 0.5
+- top5_share_inbox: 27.9 % ± 1.8
+- top1_share_inbox: 9.4 % ± 1.0
+- top5_share_reads: 27.8 % ± 1.9
+- reads_per_query: 5.36 ± 0.16
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 1.04 ± 0.33
+- latency_median: 14.4 s ± 0.9
+- latency_p90: 36.2 s ± 0.7
+- correct_undeclared: 43.9 % ± 4.1
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 45.8 % ± 4.7
+- correct_others: 48.4 % ± 1.8
+- found_ratio_newcomers: 1.09 ± 0.29
+- asked_ratio_newcomers: 1.21 ± 0.37
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 15.9 s ± 0.7
+- latency_low_median: 14.0 s ± 1.7
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.3 % ± 0.3
+- runtime_s: 20 s ± 4
+
+## p3_size / agents=1000 / Search + learned (hybrid) (3 seeds)
+- correct: 69.8 % ± 0.3
+- wrong: 8.5 % ± 0.6
+- top5_share_inbox: 30.5 % ± 5.5
+- top1_share_inbox: 11.7 % ± 1.8
+- top5_share_reads: 30.5 % ± 5.6
+- reads_per_query: 3.70 ± 0.10
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 0.69 ± 0.22
+- latency_median: 13.1 s ± 1.0
+- latency_p90: 34.2 s ± 0.8
+- correct_undeclared: 49.6 % ± 6.4
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 69.7 % ± 3.0
+- correct_others: 69.8 % ± 1.1
+- found_ratio_newcomers: 2.14 ± 0.23
+- asked_ratio_newcomers: 2.32 ± 0.79
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 13.3 s ± 2.0
+- latency_low_median: 13.3 s ± 1.2
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 1.6 % ± 0.8
+- runtime_s: 19 s ± 1
+
+## p3_size / agents=1000 / Signed track records (3 seeds)
+- correct: 70.6 % ± 0.2
+- wrong: 8.9 % ± 1.2
+- top5_share_inbox: 33.4 % ± 8.1
+- top1_share_inbox: 13.1 % ± 0.9
+- top5_share_reads: 33.4 % ± 8.2
+- reads_per_query: 3.57 ± 0.07
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 0.66 ± 0.19
+- latency_median: 13.2 s ± 1.4
+- latency_p90: 34.9 s ± 2.0
+- correct_undeclared: 50.9 % ± 3.2
+- newcomer_share: 30.3 % ± 0.6
+- correct_newcomers: 70.4 % ± 1.9
+- correct_others: 70.8 % ± 1.0
+- found_ratio_newcomers: 2.04 ± 0.09
+- asked_ratio_newcomers: 2.34 ± 0.72
+- known_by_newcomers: 30.6 ± 0.8
+- known_by_others: 90.3 ± 6.9
+- latency_high_median: 13.5 s ± 2.3
+- latency_low_median: 13.4 s ± 1.1
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.0 % ± 0.9
+- runtime_s: 19 s ± 1
+
+## p3_size / agents=10000 / Declared search (3 seeds)
+- correct: 59.2 % ± 3.7
+- wrong: 6.8 % ± 0.2
+- top5_share_inbox: 40.9 % ± 4.2
+- top1_share_inbox: 21.2 % ± 7.9
+- top5_share_reads: 37.9 % ± 1.4
+- reads_per_query: 3.60 ± 0.12
+- rejected_per_query: 0.66 ± 0.31
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 16.2 s ± 0.2
+- latency_p90: 48.5 s ± 0.9
+- correct_undeclared: 24.9 % ± 3.9
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 59.3 % ± 4.1
+- correct_others: 59.2 % ± 3.5
+- found_ratio_newcomers: 3.57 ± 0.43
+- asked_ratio_newcomers: 3.49 ± 0.95
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 15.4 s ± 0.9
+- latency_low_median: 16.7 s ± 0.5
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 7.4 % ± 8.3
+- runtime_s: 216 s ± 11
+
+## p3_size / agents=10000 / Declared search, trust-ranked (3 seeds)
+- correct: 55.4 % ± 3.5
+- wrong: 9.8 % ± 0.9
+- top5_share_inbox: 43.7 % ± 4.2
+- top1_share_inbox: 22.6 % ± 8.0
+- top5_share_reads: 40.1 % ± 2.4
+- reads_per_query: 3.63 ± 0.08
+- rejected_per_query: 0.71 ± 0.32
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 19.1 s ± 1.0
+- latency_p90: 52.0 s ± 3.6
+- correct_undeclared: 24.7 % ± 3.9
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 55.6 % ± 3.9
+- correct_others: 55.4 % ± 3.4
+- found_ratio_newcomers: 2.29 ± 0.41
+- asked_ratio_newcomers: 2.63 ± 0.37
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 17.0 s ± 1.1
+- latency_low_median: 20.1 s ± 0.9
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 7.6 % ± 8.0
+- runtime_s: 230 s ± 32
+
+## p3_size / agents=10000 / Phonebook (3 seeds)
+- correct: 15.9 % ± 0.8
+- wrong: 1.0 % ± 0.1
+- top5_share_inbox: 10.3 % ± 0.3
+- top1_share_inbox: 2.5 % ± 0.1
+- top5_share_reads: 10.8 % ± 0.2
+- reads_per_query: 6.27 ± 0.13
+- rejected_per_query: 0.70 ± 0.18
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 10.4 s ± 0.1
+- latency_p90: 33.3 s ± 1.9
+- correct_undeclared: 11.6 % ± 1.2
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 11.0 % ± 0.3
+- correct_others: 18.2 % ± 1.1
+- found_ratio_newcomers: 1.42 ± 0.20
+- asked_ratio_newcomers: 2.56 ± 0.08
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 10.5 s ± 0.2
+- latency_low_median: 10.4 s ± 0.2
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 0.3 % ± 0.0
+- runtime_s: 114 s ± 3
+
+## p3_size / agents=10000 / Ask the senior / oldest agent (3 seeds)
+- correct: 10.9 % ± 0.6
+- wrong: 0.9 % ± 0.3
+- top5_share_inbox: 92.5 % ± 2.4
+- top1_share_inbox: 84.1 % ± 5.0
+- top5_share_reads: 70.3 % ± 2.9
+- reads_per_query: 1.69 ± 0.33
+- rejected_per_query: 5.69 ± 0.31
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 10.4 s ± 0.1
+- latency_p90: 34.5 s ± 1.6
+- correct_undeclared: 6.8 % ± 0.5
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 7.9 % ± 0.4
+- correct_others: 12.2 % ± 0.8
+- found_ratio_newcomers: 0.73 ± 0.02
+- asked_ratio_newcomers: 0.04 ± 0.01
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 10.6 s ± 0.7
+- latency_low_median: 10.4 s ± 0.0
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 75.8 % ± 4.7
+- runtime_s: 158 s ± 14
+
+## p3_size / agents=10000 / Learned, central log (3 seeds)
+- correct: 41.1 % ± 0.6
+- wrong: 13.9 % ± 0.1
+- top5_share_inbox: 72.8 % ± 1.7
+- top1_share_inbox: 46.3 % ± 4.5
+- top5_share_reads: 62.0 % ± 1.3
+- reads_per_query: 3.05 ± 0.14
+- rejected_per_query: 1.79 ± 0.16
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 16.0 s ± 0.6
+- latency_p90: 52.1 s ± 1.0
+- correct_undeclared: 31.3 % ± 1.3
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 39.6 % ± 0.3
+- correct_others: 41.8 % ± 0.7
+- found_ratio_newcomers: 0.92 ± 0.30
+- asked_ratio_newcomers: 0.49 ± 0.25
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 14.0 s ± 0.4
+- latency_low_median: 17.1 s ± 0.6
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 18.5 % ± 0.7
+- runtime_s: 1392 s ± 61
+
+## p3_size / agents=10000 / Learned, local (3 seeds)
+- correct: 27.3 % ± 2.0
+- wrong: 3.6 % ± 0.8
+- top5_share_inbox: 22.3 % ± 4.0
+- top1_share_inbox: 9.1 % ± 4.3
+- top5_share_reads: 22.0 % ± 2.2
+- reads_per_query: 5.65 ± 0.15
+- rejected_per_query: 0.71 ± 0.08
+- busy_per_query: 0.00 ± 0.00
+- latency_median: 15.7 s ± 0.5
+- latency_p90: 48.6 s ± 2.6
+- correct_undeclared: 25.8 % ± 0.8
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 23.8 % ± 0.9
+- correct_others: 28.8 % ± 2.5
+- found_ratio_newcomers: 0.82 ± 0.10
+- asked_ratio_newcomers: 1.07 ± 0.07
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 16.6 s ± 1.0
+- latency_low_median: 15.2 s ± 0.1
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.5 % ± 2.7
+- runtime_s: 211 s ± 7
+
+## p3_size / agents=10000 / Learned, local, load-aware (3 seeds)
+- correct: 25.6 % ± 2.7
+- wrong: 3.6 % ± 1.4
+- top5_share_inbox: 19.2 % ± 5.4
+- top1_share_inbox: 7.9 % ± 5.9
+- top5_share_reads: 19.2 % ± 5.4
+- reads_per_query: 6.51 ± 0.18
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 1.34 ± 0.09
+- latency_median: 11.9 s ± 0.8
+- latency_p90: 32.7 s ± 1.9
+- correct_undeclared: 23.4 % ± 1.7
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 22.5 % ± 2.1
+- correct_others: 27.0 % ± 3.1
+- found_ratio_newcomers: 0.94 ± 0.07
+- asked_ratio_newcomers: 1.40 ± 0.06
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 13.0 s ± 1.4
+- latency_low_median: 11.6 s ± 1.0
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 2.3 % ± 3.9
+- runtime_s: 255 s ± 31
+
+## p3_size / agents=10000 / Search + learned (hybrid) (3 seeds)
+- correct: 61.5 % ± 3.0
+- wrong: 8.7 % ± 0.1
+- top5_share_inbox: 37.3 % ± 5.2
+- top1_share_inbox: 18.6 % ± 8.9
+- top5_share_reads: 37.3 % ± 5.2
+- reads_per_query: 4.11 ± 0.17
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 1.05 ± 0.24
+- latency_median: 13.2 s ± 0.3
+- latency_p90: 34.2 s ± 0.4
+- correct_undeclared: 37.8 % ± 3.6
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 60.4 % ± 4.1
+- correct_others: 61.9 % ± 2.5
+- found_ratio_newcomers: 1.95 ± 0.22
+- asked_ratio_newcomers: 2.19 ± 0.56
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 13.7 s ± 0.7
+- latency_low_median: 13.1 s ± 0.4
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 5.3 % ± 4.7
+- runtime_s: 226 s ± 19
+
+## p3_size / agents=10000 / Signed track records (3 seeds)
+- correct: 62.1 % ± 3.0
+- wrong: 9.2 % ± 0.2
+- top5_share_inbox: 39.5 % ± 5.4
+- top1_share_inbox: 20.2 % ± 9.1
+- top5_share_reads: 39.6 % ± 5.3
+- reads_per_query: 4.04 ± 0.16
+- rejected_per_query: 0.00 ± 0.00
+- busy_per_query: 1.05 ± 0.29
+- latency_median: 13.6 s ± 0.6
+- latency_p90: 34.9 s ± 1.2
+- correct_undeclared: 38.9 % ± 1.4
+- newcomer_share: 31.0 % ± 0.2
+- correct_newcomers: 61.2 % ± 3.2
+- correct_others: 62.5 % ± 2.9
+- found_ratio_newcomers: 1.92 ± 0.12
+- asked_ratio_newcomers: 2.24 ± 0.47
+- known_by_newcomers: 30.8 ± 0.3
+- known_by_others: 92.0 ± 0.4
+- latency_high_median: 13.9 s ± 1.1
+- latency_low_median: 13.6 s ± 0.5
+- top5_share_triage: 0.0 % ± 0.0
+- top5_share_approvals: 0.0 % ± 0.0
+- top01_share_inbox: 5.3 % ± 4.8
+- runtime_s: 230 s ± 9

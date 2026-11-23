@@ -630,7 +630,7 @@ when there is no other group. (2) Stewards of the shared lane come from the
 whole network (see the note in §14.1). The open-network runs made before these
 changes, and before the refit of §14.8, were stopped and discarded.
 
-## 15. Phase 3 plan: towards 100,000 agents (written 10 Nov 2026, not built yet)
+## 15. Phase 3: towards 100,000 agents (plan written 10 Nov 2026; built and run 19–20 Nov, §15.1–15.5)
 
 Phase 2 showed that at 1,000 agents an agent's own memory covers too little
 of the network and that search plus network-wide evidence scales best. Phase
@@ -655,3 +655,110 @@ hour), 7 (index: one, sharded, none). Gate: at 1,000 agents the scalable code
 gives the Phase 2 results within the noise, and one 100,000-agent run fits in a
 few hours on two cores. The expectations will be written after the scalable
 code passes that gate and before the large runs.
+
+### 15.1 What was built (v6, 19 Nov 2026)
+
+Every change is an option that is off by default; with the defaults, a
+fingerprint of a v3 world and eight v3 runs and of two open-network worlds
+(300 and 1,000 agents) and nine runs is bit-identical to v5.
+
+Speed-ups that change nothing (checked with the same fingerprints):
+
+* memory scores are computed over the agents a memory knows, not arrays the
+  size of the network; adding to a memory uses an index of its prototypes
+  instead of scanning them all (the central log holds one per question);
+* the history keeps the members of each team and who has left instead of
+  rescanning everyone, finds the longest-serving known agent with arrays, looks
+  up roles per agent once a quarter and finds each domain's steward in one pass;
+* answer checks look up analogues in a per-agent index; topics are drawn from
+  a cumulative table.
+
+Options for large networks (`large_network_config` in network.py and three
+`SimConfig` fields):
+
+| option | what it does | why |
+|---|---|---|
+| topic space grows with the network | 28 lanes and 40 domains per 1,000 agents (Phase 2's space at 1,000) | about three groups per lane at every size; removes the confound noted in Phase 2 (fixed 28 lanes) |
+| `contacts="sampled"` | each agent's contacts drawn directly: how many (binomial), then which (uniform, no repeats) | same chances as one draw per pair, but cost grows with n instead of n² |
+| `memory_limit=200` | an agent remembers at most 200 others; the one observed longest ago is forgotten | bounds memory; at 1,000 agents an agent knows 84 others on average (p90 148) |
+| `vector_mode="lazy"` | topic vectors built when needed; the lane part is one vector per lane (as fitted in §14.2, where the lane part is fully shared) | 10,000 agents have 2,400 topics in 281 lanes: 4 million items, too many to store |
+| `search_index="hnsw"` | declared search looks at the 256 nearest declared rows in an approximate index (faiss HNSW, one thread) instead of scoring every row | exact search scores every row for every question |
+| `own_work_events="lazy"` | an agent's next block of own work is drawn when the previous one arrives (own random stream) | the event queue holds one block per agent instead of about 340 |
+| `peak_window` | runs shorter than an hour spread the deadline peaks over an hour and look at its middle | otherwise a run shorter than a peak (12 min) puts every team in its peak at once; at 300 agents a 10-minute run then answers 54 % with declared search instead of 66 % |
+
+New measure: share of messages received by the busiest 0.1 % (10 agents at
+10,000, like the busiest 1 % at 1,000).
+
+### 15.2 Gate (written 19 Nov 2026, before the gate runs)
+
+At 1,000 agents, with every option above on (lazy vectors, sampled contacts,
+memory limit 200, HNSW search, lazy own work), agent timing and one hour of
+questions as in Phase 2 (`net_speed`, "agents"), 9 strategies × 5 seeds
+(0–4), compared with Phase 2's runs on the same seeds:
+
+1. the answered share of every strategy within 4 points of Phase 2;
+2. rank correlation of the nine strategies ≥ 0.9;
+3. under asking the oldest agent, the busiest 1 % share within 5 points.
+
+If the gate fails, the options are switched on one at a time to find the
+cause, and the fix is documented here before anything larger is run.
+
+### 15.3 How far it goes on this machine
+
+The runs are made on two cores with 7 GB of memory. Before the large runs:
+a 10,000-agent world is built and timed, and memory measured. 100,000 agents
+are attempted only if the 10,000-agent numbers show that a world and one run
+fit in memory and in a few hours; otherwise the limit is reported with the
+measurements, not worked around with settings that change the results.
+
+### 15.4 Amendments before the size runs (19 Nov 2026)
+
+* **Gate result.** Passed: largest difference 2.0 points (learned, central
+  log 57.0 % → 55.0 %), rank correlation 1.00, busiest 1 % under asking the
+  oldest agent 67 % → 67 % (`results/table_v6_gate.md`).
+* **Short runs.** A quarter of an hour of questions (`horizon=900`) with the
+  peaks spread over an hour (`peak_window=3600`). At 1,000 agents this gives
+  the hour's answered share within 1–3 points for most strategies but 5 points
+  less for learned local memory with and without load-awareness (agents learn
+  during the run). So 1,000 and 10,000 agents are compared at the same short
+  setting, never a short run against an hour.
+* **Questions in a growing topic space.** A question is about knowledge
+  someone holds: v3 draws a topic by popularity, up to 30 times, until someone
+  holds it in the lane asked about, and otherwise drops the question. When the
+  topic space grows with the network, each lane covers a smaller share of all
+  topics, so at 10,000 agents 55 % of questions were dropped (7 % at 1,000):
+  the load would have halved with size. Found in the first timing run at
+  10,000 agents (question count, run time and memory; that run is not used).
+  v6 (`question_topics="held"`) draws among the topics held in that lane with
+  the same popularity weights: the same as unlimited tries. Questions
+  generated: 98 % of the nominal rate at 1,000 agents, 100 % at 10,000. Both
+  sizes use it; the 1,000-agent runs with Phase 2's rule are kept as
+  "agents=1000, Phase 2 questions" to show what it changes.
+* **Memory.** Two 10,000-agent runs at once did not fit in 7 GB (one process
+  reached 3.2 GB and was stopped by the system), so the large runs are made
+  one at a time per process.
+
+### 15.5 Outcome (20 Nov 2026)
+
+* **No expectations were written down for the size runs** before they were
+  made, although the plan above said they would be. The 10,000-agent results
+  (`RESULTS_V6.md`) are therefore exploratory, not tests of predictions.
+* **10,000 agents run on this machine:** a world takes 4.7 minutes and
+  1.7 GB at its peak; a run of a quarter of an hour of questions (about 75,000
+  questions) takes 2–4 minutes and up to 3.2 GB, except the central log
+  (23 minutes, against 41 seconds at 1,000 agents: the log grows with every
+  question and is scored at every step, so its cost grows much faster than
+  the network).
+* **100,000 agents were not attempted.** The agents' memories alone take
+  371 MB at 10,000 agents (35 KB per agent; the memory limit of 200 never
+  binds: the most any agent knows is 186), so 100,000 agents need about
+  3.7 GB for one copy of them; a history holds them with room to grow plus
+  the finished world, and a run holds the world plus the strategy's copy.
+  Growing in proportion from 10,000 agents (1.7 GB and 3.2 GB), a
+  100,000-agent world would need about 17 GB and a run about 32 GB, against
+  7 GB here. What would make it fit, each needing its
+  own check against the 10,000-agent results: memories shared between the
+  world and a run until an agent learns something (copy on write), the
+  history giving up its memories as the world is built, and 16-bit
+  prototypes. Time would not be the limit (about an hour for a world and
+  40 minutes per run, by the same growth), except for the central log.
